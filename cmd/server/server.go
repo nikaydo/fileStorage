@@ -20,6 +20,7 @@ func main() {
 		}
 		go hand(&srv)
 	}
+
 }
 
 func hand(srv *server.Server) {

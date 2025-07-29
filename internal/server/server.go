@@ -22,6 +22,7 @@ func ServerInit(port, addr string) (Server, error) {
 	}
 	s.Serv = listener
 	return s, nil
+
 }
 
 func (s *Server) Connect() error {
