@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/binary"
+	"fmt"
 	"io"
 	"net"
 )
@@ -13,9 +14,9 @@ type Server struct {
 	Conn net.Conn
 }
 
-func ServerInit() (Server, error) {
-	var s Server
-	listener, err := net.Listen("tcp", s.Port)
+func ServerInit(port, addr string) (Server, error) {
+	s := Server{Port: port, Addr: addr}
+	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%s", s.Addr, s.Port))
 	if err != nil {
 		return s, err
 	}
@@ -23,14 +24,13 @@ func ServerInit() (Server, error) {
 	return s, nil
 }
 
-func (s *Server) Run(f func(c net.Conn)) {
-	for {
-		conn, err := s.Serv.Accept()
-		if err != nil {
-
-		}
-		go f(conn)
+func (s *Server) Connect() error {
+	conn, err := s.Serv.Accept()
+	if err != nil {
+		return err
 	}
+	s.Conn = conn
+	return nil
 }
 
 func (s *Server) Read() ([]byte, error) {
