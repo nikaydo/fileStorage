@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"os"
 )
 
 type Server struct {
@@ -34,6 +35,16 @@ func (s *Server) Connect() error {
 	return nil
 }
 
+func (s *Server) Write(data []byte) error {
+	if err := binary.Write(s.Conn, binary.BigEndian, uint64(len(data))); err != nil {
+		return err
+	}
+	if _, err := s.Conn.Write(data); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *Server) Read() ([]byte, error) {
 	var data uint64
 	err := binary.Read(s.Conn, binary.BigEndian, &data)
@@ -46,4 +57,30 @@ func (s *Server) Read() ([]byte, error) {
 		return nil, err
 	}
 	return nameBuf, nil
+}
+
+func (s *Server) WriteFile(path string) error {
+	file, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	inf, err := file.Stat()
+	if err != nil {
+		return err
+	}
+	if err := binary.Write(s.Conn, binary.BigEndian, uint64(inf.Size())); err != nil {
+		return err
+	}
+	data := make([]byte, 4096)
+	for {
+		_, err := file.Read(data)
+		if err == io.EOF {
+			break
+		}
+		if _, err := s.Conn.Write(data); err != nil {
+			return err
+		}
+	}
+	return nil
 }
