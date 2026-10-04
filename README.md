@@ -1,5 +1,16 @@
 # File Storage Server
 
+
+## Настройка
+
+В репозитории лежит только шаблон конфигурации — реальные значения хранятся локально в `.env`:
+
+```bash
+cp .env.example .env
+```
+
+После этого заполните `.env`, подставив собственные значения.
+
 A complete TCP-based file storage system written in pure Go, including both server and client implementations. The system allows clients to perform basic file operations over a network connection using a clean command-line interface.
 
 ## Features
